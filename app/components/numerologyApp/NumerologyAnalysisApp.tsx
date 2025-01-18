@@ -7,10 +7,9 @@ const NumerologyApp = () => {
     fullName: '',
     birthDate: ''
   });
-  const p: any = [];
-  const [reading, setReading] = useState(new Array<any>);
+  const [reading, setReading] = useState(new Array<any>); // eslint-disable-line @typescript-eslint/no-explicit-any
 
-  const numerologyMeanings: any = {
+  const numerologyMeanings: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
     lifePathDescriptions: {
       1: "Natural born leader, independent, ambitious, and innovative",
       2: "Cooperative, diplomatic, sensitive, and peaceful",
@@ -38,7 +37,7 @@ const NumerologyApp = () => {
     }
   };
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
     const { name, value } = e.target;
     setFormData(prevData => ({
       ...prevData,
@@ -46,7 +45,7 @@ const NumerologyApp = () => {
     }));
   };
 
-  const calculateLifePath = (birthDate: any) => {
+  const calculateLifePath = (birthDate: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
     // Remove any non-numeric characters
     const numbers = birthDate.replace(/\D/g, '');
     
@@ -61,7 +60,7 @@ const NumerologyApp = () => {
   };
 
   const calculateDestiny = (name: string) => {
-    const letterValues: any = {
+    const letterValues: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
       a: 1, j: 1, s: 1,
       b: 2, k: 2, t: 2,
       c: 3, l: 3, u: 3,
@@ -88,13 +87,13 @@ const NumerologyApp = () => {
     return destinyNumber;
   };
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = (e: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
     e.preventDefault();
     
     const lifePathNumber = calculateLifePath(formData.birthDate);
     const destinyNumber = calculateDestiny(formData.fullName);
 
-    const dataSet: any = [{
+    const dataSet: any = [{ // eslint-disable-line @typescript-eslint/no-explicit-any
         lifePath: {
           number: lifePathNumber,
           description: numerologyMeanings.lifePathDescriptions[lifePathNumber]
@@ -172,7 +171,7 @@ const NumerologyApp = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg">Life Path Number</h3>
-                  <p className="text-sm text-gray-600">Your life's purpose and journey</p>
+                  <p className="text-sm text-gray-600">Your life&apos;s purpose and journey</p>
                 </div>
               </div>
               <p className="text-gray-700">{reading[0].lifePath.description}</p>
@@ -186,7 +185,7 @@ const NumerologyApp = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg">Destiny Number</h3>
-                  <p className="text-sm text-gray-600">Your life's ultimate goal</p>
+                  <p className="text-sm text-gray-600">Your life&apos;s ultimate goal</p>
                 </div>
               </div>
               <p className="text-gray-700">{reading[0].destiny.description}</p>

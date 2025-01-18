@@ -6,16 +6,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card-component';
 import { Alert, AlertDescription } from '../ui/alert-component';
 import { coffeeAnalysisDataList } from './data';
 import { getRandomIndex } from '../ui/lib/utils';
+import Image from 'next/image';
 
 const CoffeeReader = () => {
-  let q: any = [];
   const [imagePreview, setImagePreview] = useState('');
-  const [analysis, setAnalysis] = useState(q);
+  const [analysis, setAnalysis] = useState(new Array<any>); // eslint-disable-line @typescript-eslint/no-explicit-any
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [randIndex, setRandIndex] = useState(0);
 
-  const cupSections: any = {
+  const cupSections: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
     rim: {
       name: 'Rim (Present)',
       description: 'Represents current situations and immediate future'
@@ -30,7 +30,7 @@ const CoffeeReader = () => {
     }
   };
 
-  const commonSymbols: any = {
+  const commonSymbols: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
     heart: 'Love and emotions',
     bird: 'Good news or messages',
     tree: 'Personal growth',
@@ -41,7 +41,7 @@ const CoffeeReader = () => {
     fish: 'Prosperity and abundance'
   };
 
-  const handleImageUpload = async (event: any) => {
+  const handleImageUpload = async (event: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -74,7 +74,7 @@ const CoffeeReader = () => {
     await new Promise(resolve => setTimeout(resolve, 2000));
     
     // Example analysis - in a real app, this would come from an AI model
-    const analysisDataSet: any = coffeeAnalysisDataList;
+    const analysisDataSet: any = coffeeAnalysisDataList; // eslint-disable-line @typescript-eslint/no-explicit-any
     setAnalysis(analysisDataSet);
     const randomIndex = getRandomIndex(analysisDataSet.length);
     setRandIndex(randomIndex);
@@ -122,10 +122,12 @@ const CoffeeReader = () => {
 
               {imagePreview && (
                 <div className="relative aspect-square rounded-lg overflow-hidden bg-gray-100">
-                  <img
+                  <Image
                     src={imagePreview}
                     alt="Coffee cup preview"
                     className="object-contain w-full h-full"
+                    width={300}
+                    height={300}
                   />
                 </div>
               )}
@@ -158,7 +160,7 @@ const CoffeeReader = () => {
                   <Card className="p-4">
                     <h3 className="font-semibold text-lg mb-2">Overall Reading</h3>
                     <div className="grid grid-cols-2 gap-2 text-sm">
-                      {Object.entries(analysis[randIndex].overall).map(([key, value]: any) => (
+                      {Object.entries(analysis[randIndex].overall).map(([key, value]: any) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
                         <div key={key}>
                           <strong className="capitalize">{key}:</strong> {value}
                         </div>
@@ -167,7 +169,7 @@ const CoffeeReader = () => {
                   </Card>
 
                   {/* Detailed Analysis by Section */}
-                  {Object.entries(analysis[randIndex].sections).map(([section, details]: any) => (
+                  {Object.entries(analysis[randIndex].sections).map(([section, details]: any) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
                     <Card key={section} className="p-4">
                       <h3 className="font-semibold text-lg mb-2">
                         {cupSections[section].name}

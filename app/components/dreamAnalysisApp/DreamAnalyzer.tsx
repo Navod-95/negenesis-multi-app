@@ -2,13 +2,13 @@
 
 import React, { useState } from 'react';
 import { Book, Moon, Search, Plus, Calendar, RotateCw, Sparkles, Cloud, Sun } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card-component';
+import { Card, CardContent } from '../ui/card-component';
 import { Alert, AlertDescription } from '../ui/alert-component';
 
 const DreamAnalyzer = () => {
-  const [dreams, setDreams] = useState(new Array<any>);
+  const [dreams, setDreams] = useState(new Array<any>); // eslint-disable-line @typescript-eslint/no-explicit-any
   const [currentDream, setCurrentDream] = useState('');
-  const [analysis, setAnalysis] = useState(null);
+  //const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -25,7 +25,7 @@ const DreamAnalyzer = () => {
     vehicles: 'Direction in life, journey towards goals'
   };
 
-  const analyzeDream = async (dreamText: any) => {
+  const analyzeDream = async (dreamText: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
     setLoading(true);
     setError('');
 
@@ -34,7 +34,7 @@ const DreamAnalyzer = () => {
       await new Promise(resolve => setTimeout(resolve, 1500));
 
       // Example analysis - in a real app, this would come from an AI model
-      const dreamAnalysis: any = {
+      const dreamAnalysis: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
         mainThemes: ['personal growth', 'transformation', 'relationships'],
         symbols: detectSymbols(dreamText),
         mood: analyzeMood(dreamText),
@@ -43,8 +43,8 @@ const DreamAnalyzer = () => {
         timestamp: new Date().toISOString()
       };
 
-      setAnalysis(dreamAnalysis);
-      setDreams((prev: any) => [...prev, { text: dreamText, analysis: dreamAnalysis }]);
+      //setAnalysis(dreamAnalysis);
+      setDreams((prev: any) => [...prev, { text: dreamText, analysis: dreamAnalysis }]); // eslint-disable-line @typescript-eslint/no-explicit-any
       setCurrentDream('');
     } catch (err) {
       setError('Failed to analyze dream. Please try again.');
@@ -95,7 +95,7 @@ const DreamAnalyzer = () => {
     // Simple guidance generation - would use AI in real app
     const mood = analyzeMood(text);
     
-    const guidance: any = {
+    const guidance: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
       positive: 'Consider how you can maintain and build upon the positive elements in your waking life.',
       negative: 'These symbols might be highlighting areas that need attention or resolution in your life.',
       neutral: 'Reflect on these symbols and how they might relate to your current life situation.'
@@ -105,12 +105,12 @@ const DreamAnalyzer = () => {
   };
 
   // Filter dreams based on search term
-  const filteredDreams = dreams.filter((dream: any) =>
+  const filteredDreams = dreams.filter((dream: any) => // eslint-disable-line @typescript-eslint/no-explicit-any
     dream.text.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    dream.analysis.mainThemes.some((theme: any) => 
+    dream.analysis.mainThemes.some((theme: any) =>  // eslint-disable-line @typescript-eslint/no-explicit-any
       theme.toLowerCase().includes(searchTerm.toLowerCase())
     ) ||
-    dream.analysis.symbols.some((symbol: any) => 
+    dream.analysis.symbols.some((symbol: any) => // eslint-disable-line @typescript-eslint/no-explicit-any
       symbol.symbol.toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
@@ -217,7 +217,7 @@ const DreamAnalyzer = () => {
 
             {/* Dream Journal Entries */}
             <div className="space-y-6">
-              {filteredDreams.map((dream: any, index: number) => (
+              {filteredDreams.map((dream: any, index: number) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
                 <Card key={index} className="bg-white shadow-lg border-0 hover:shadow-xl transition-shadow duration-200">
                   <CardContent className="p-6">
                     <div className="flex justify-between items-start mb-4">
@@ -241,7 +241,7 @@ const DreamAnalyzer = () => {
                           Main Themes
                         </h4>
                         <div className="flex flex-wrap gap-2">
-                          {dream.analysis.mainThemes.map((theme: any, i: number) => (
+                          {dream.analysis.mainThemes.map((theme: any, i: number) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
                             <span
                               key={i}
                               className="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium"
@@ -256,7 +256,7 @@ const DreamAnalyzer = () => {
                       <div>
                         <h4 className="font-medium text-gray-800 mb-2">Symbols Found</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          {dream.analysis.symbols.map((symbol: any, i: number) => (
+                          {dream.analysis.symbols.map((symbol: any, i: number) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
                             <div key={i} className="bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
                               <span className="font-medium text-indigo-600">{symbol.symbol}</span>
                               <p className="text-sm text-gray-600 mt-1">{symbol.meaning}</p>

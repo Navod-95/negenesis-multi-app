@@ -14,7 +14,7 @@ const AstrologyApp = () => {
   ];
 
   const getPrediction = (sign: string) => {
-    const predictions: any = {
+    const predictions: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
       Aries: "Your natural leadership skills will shine today. Trust your instincts on an important decision.",
       Taurus: "Financial opportunities are heading your way. Stay grounded and practical in your approach.",
       Gemini: "Your communication skills are heightened. Express your ideas - people are ready to listen.",
@@ -69,7 +69,7 @@ const AstrologyApp = () => {
             {prediction && (
               <div className="mt-8 p-6 bg-purple-50 rounded-lg">
                 <h3 className="text-xl font-semibold text-purple-900 mb-3">
-                  {selectedSign}'s Daily Prediction
+                  {selectedSign} &apos; s Daily Prediction
                 </h3>
                 <p className="text-gray-700 leading-relaxed">
                   {prediction}
