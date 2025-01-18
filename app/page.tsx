@@ -1,18 +1,15 @@
-import AstrologyApp from "./components/astrologyApp/astrology-app";
-import CoffeeReader from "./components/coffeeCupReadingAnalysisApp/CoffeeReader";
-import DreamAnalyzer from "./components/dreamAnalysisApp/DreamAnalyzer";
-import NumerologyApp from "./components/numerologyApp/NumerologyAnalysisApp";
-import PalmReader from "./components/palmReadingApp/PalmReadingAnalysisApp";
+import Link from "next/link";
 
 export default function Home() {
   return (
     <>
-      <h1>Test</h1>
-      <PalmReader></PalmReader>
-      <AstrologyApp></AstrologyApp>
-      <CoffeeReader></CoffeeReader>
-      <DreamAnalyzer></DreamAnalyzer>
-      <NumerologyApp></NumerologyApp>
+      <ul className="flex gap-10 p-8 bg-blue-500 text-white">
+        <li><Link href="/palm-reading">Palm-Reading</Link></li>
+        <li><Link href="/coffee-cup-reading">Coffee-cup-reading</Link></li>
+        <li><Link href="/asterology">Asterology</Link></li>
+        <li><Link href="/dream-analyser">Dream-Analyser</Link></li>
+        <li><Link href="/numerology">Numerology</Link></li>
+      </ul>
     </>
   );
 }
