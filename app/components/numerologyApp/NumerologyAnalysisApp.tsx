@@ -1,208 +1,216 @@
 "use client"
-
 import React, { useState } from 'react';
+import { Calculator, Calendar, User } from 'lucide-react';
+import { Card, CardContent, CardHeader } from '../ui/card-component';
 
-const NumerologyApp = () => {
-  const [formData, setFormData] = useState({
-    fullName: '',
-    birthDate: ''
-  });
-  const [reading, setReading] = useState(new Array<any>); // eslint-disable-line @typescript-eslint/no-explicit-any
 
-  const numerologyMeanings: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
-    lifePathDescriptions: {
-      1: "Natural born leader, independent, ambitious, and innovative",
-      2: "Cooperative, diplomatic, sensitive, and peaceful",
-      3: "Creative, expressive, optimistic, and social",
-      4: "Practical, organized, disciplined, and trustworthy",
-      5: "Adventurous, freedom-loving, versatile, and adaptable",
-      6: "Nurturing, responsible, caring, and harmonious",
-      7: "Analytical, introspective, spiritual, and intellectual",
-      8: "Ambitious, business-minded, successful, and power-seeking",
-      9: "Humanitarian, compassionate, spiritual, and selfless",
-      11: "Intuitive, inspirational, idealistic, and visionary",
-      22: "Master builder, practical visionary, powerful, and successful",
-      33: "Master teacher, nurturing, compassionate, and spiritual"
-    },
-    destinyDescriptions: {
-      1: "Born to lead and pioneer new paths",
-      2: "Destined to be a peacemaker and mediator",
-      3: "Meant to express creativity and inspire others",
-      4: "Called to build stable foundations and systems",
-      5: "Destined for adventure and positive change",
-      6: "Meant to nurture and create harmony",
-      7: "Called to seek wisdom and spiritual truth",
-      8: "Destined for material and spiritual abundance",
-      9: "Meant to serve humanity and give to others"
-    }
-  };
+const NumerologyCalculator = () => {
+  const [birthDate, setBirthDate] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [results, setResults] = useState(Array<any>); // eslint-disable-line @typescript-eslint/no-explicit-any
+  const [isCalculating, setIsCalculating] = useState(false);
 
-  const handleChange = (e: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
-    const { name, value } = e.target;
-    setFormData(prevData => ({
-      ...prevData,
-      [name]: value
-    }));
-  };
-
-  const calculateLifePath = (birthDate: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+  const calculateLifePathNumber = (date: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
     // Remove any non-numeric characters
-    const numbers = birthDate.replace(/\D/g, '');
+    const numbers = date.replace(/\D/g, '');
+    let sum = 0;
     
-    // Keep reducing until we get a single digit or master number
-    let sum = numbers.split('').reduce((acc: number, curr: number) => acc + curr, 0);
+    // Add all numbers together
+    for (const num of numbers) {
+      sum += parseInt(num);
+    }
     
+    // Reduce to single digit unless it's 11, 22, or 33 (master numbers)
     while (sum > 9 && sum !== 11 && sum !== 22 && sum !== 33) {
-      sum = sum.toString().split('').reduce((acc: number, curr: number) => acc + curr, 0);
+      let tempSum = 0;
+      sum.toString().split('').forEach(num => {
+        tempSum += parseInt(num);
+      });
+      sum = tempSum;
     }
     
     return sum;
   };
 
-  const calculateDestiny = (name: string) => {
-    const letterValues: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
-      a: 1, j: 1, s: 1,
-      b: 2, k: 2, t: 2,
-      c: 3, l: 3, u: 3,
-      d: 4, m: 4, v: 4,
-      e: 5, n: 5, w: 5,
-      f: 6, o: 6, x: 6,
-      g: 7, p: 7, y: 7,
-      h: 8, q: 8, z: 8,
-      i: 9, r: 9
+  const calculateNameNumber = (name: string) => { 
+    const numerologyMap: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
+      'a': 1, 'j': 1, 's': 1,
+      'b': 2, 'k': 2, 't': 2,
+      'c': 3, 'l': 3, 'u': 3,
+      'd': 4, 'm': 4, 'v': 4,
+      'e': 5, 'n': 5, 'w': 5,
+      'f': 6, 'o': 6, 'x': 6,
+      'g': 7, 'p': 7, 'y': 7,
+      'h': 8, 'q': 8, 'z': 8,
+      'i': 9, 'r': 9
     };
 
-    const nameSum = name.toLowerCase()
-      .replace(/[^a-z]/g, '')
-      .split('')
-      .reduce((sum, letter) => sum + (letterValues[letter] || 0), 0);
+    let sum = 0;
+    name.toLowerCase().replace(/[^a-z]/g, '').split('').forEach((letter:string) => {
+      sum += numerologyMap[letter] || 0;
+    });
 
-    let destinyNumber = nameSum;
-    while (destinyNumber > 9) {
-      destinyNumber = destinyNumber.toString()
-        .split('')
-        .reduce((acc, curr) => acc + parseInt(curr), 0);
+    // Reduce to single digit
+    while (sum > 9) {
+      let tempSum = 0;
+      sum.toString().split('').forEach(num => {
+        tempSum += parseInt(num);
+      });
+      sum = tempSum;
     }
 
-    return destinyNumber;
+    return sum;
   };
 
-  const handleSubmit = (e: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
-    e.preventDefault();
-    
-    const lifePathNumber = calculateLifePath(formData.birthDate);
-    const destinyNumber = calculateDestiny(formData.fullName);
+  const getLifePathMeaning = (number: number) => {
+    const meanings: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
+      1: "Natural born leader, independent, ambitious, and innovative",
+      2: "Diplomatic, cooperative, sensitive, and peacekeeping",
+      3: "Creative, expressive, optimistic, and social",
+      4: "Practical, organized, disciplined, and hard-working",
+      5: "Adventurous, freedom-loving, versatile, and adaptable",
+      6: "Nurturing, responsible, caring, and harmonious",
+      7: "Analytical, introspective, spiritual, and wisdom-seeking",
+      8: "Ambitious, business-minded, successful, and power-seeking",
+      9: "Humanitarian, compassionate, selfless, and spiritual",
+      11: "Master Number - Spiritual messenger, intuitive, and enlightened",
+      22: "Master Number - Master builder, practical visionary, and powerful achiever",
+      33: "Master Number - Master teacher, nurturing mentor, and compassionate healer"
+    };
+    return meanings[number] || "Invalid number";
+  };
 
-    const dataSet: any = [{ // eslint-disable-line @typescript-eslint/no-explicit-any
+  const getNameMeaning = (number: number) => {
+    const meanings: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
+      1: "Independent, leadership qualities, original thinker",
+      2: "Cooperative, diplomatic, sensitive to others",
+      3: "Creative self-expression, joyful, artistic",
+      4: "Practical, trustworthy, good organizer",
+      5: "Freedom lover, adventurous, progressive",
+      6: "Responsible, caring, therapeutic",
+      7: "Analytical mind, spiritual awareness, technical skills",
+      8: "Executive ability, good judgment, money handler",
+      9: "Humanitarian, giving, artistic expression"
+    };
+    return meanings[number] || "Invalid number";
+  };
+
+  const handleCalculate = async () => {
+    if (!birthDate || !fullName) return;
+
+    setIsCalculating(true);
+    
+    // Simulate calculation delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    const lifePathNum = calculateLifePathNumber(birthDate);
+    const nameNum = calculateNameNumber(fullName);
+    
+    const resultData: any = [{ // eslint-disable-line @typescript-eslint/no-explicit-any
         lifePath: {
-          number: lifePathNumber,
-          description: numerologyMeanings.lifePathDescriptions[lifePathNumber]
-        },
-        destiny: {
-          number: destinyNumber,
-          description: numerologyMeanings.destinyDescriptions[destinyNumber]
-        },
-        name: formData.fullName,
-        birthDate: formData.birthDate
-      }]
-    setReading(dataSet);
+            number: lifePathNum,
+            meaning: getLifePathMeaning(lifePathNum)
+          },
+          name: {
+            number: nameNum,
+            meaning: getNameMeaning(nameNum)
+          }
+    }];
+    setResults(resultData);
+    
+    setIsCalculating(false);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white py-8">
-      <div className="max-w-2xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Numerology Reading</h1>
-          <p className="text-gray-600">Discover your life path and destiny numbers</p>
-        </div>
-
-        {/* Input Form */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Full Name (as given at birth)
-              </label>
-              <input
-                type="text"
-                name="fullName"
-                value={formData.fullName}
-                onChange={handleChange}
-                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-200 outline-none"
-                required
-                placeholder="Enter your full birth name"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Birth Date
-              </label>
-              <input
-                type="date"
-                name="birthDate"
-                value={formData.birthDate}
-                onChange={handleChange}
-                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-200 outline-none"
-                required
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium"
-            >
-              Calculate Numbers
-            </button>
-          </form>
-        </div>
-
-        {/* Results */}
-        {reading.length > 0 && (
-          <div className="bg-white rounded-xl shadow-lg p-6 space-y-6">
-            <h2 className="text-xl font-semibold text-center mb-4">Your Numerology Reading</h2>
-            
-            {/* Life Path Number */}
-            <div className="bg-purple-50 rounded-lg p-4">
-              <div className="flex items-center gap-4 mb-2">
-                <div className="bg-purple-600 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold">
-                  {reading[0].lifePath.number}
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg">Life Path Number</h3>
-                  <p className="text-sm text-gray-600">Your life&apos;s purpose and journey</p>
-                </div>
-              </div>
-              <p className="text-gray-700">{reading[0].lifePath.description}</p>
-            </div>
-
-            {/* Destiny Number */}
-            <div className="bg-purple-50 rounded-lg p-4">
-              <div className="flex items-center gap-4 mb-2">
-                <div className="bg-purple-600 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold">
-                  {reading[0].destiny.number}
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg">Destiny Number</h3>
-                  <p className="text-sm text-gray-600">Your life&apos;s ultimate goal</p>
-                </div>
-              </div>
-              <p className="text-gray-700">{reading[0].destiny.description}</p>
-            </div>
-
-            {/* Additional Info */}
-            <div className="border-t pt-4 mt-4">
-              <p className="text-sm text-gray-600 text-center">
-                This reading is based on your birth name: {reading[0].name}<br />
-                and birth date: {new Date(reading[0].birthDate).toLocaleDateString()}
-              </p>
-            </div>
+    <div className="min-h-screen bg-gray-50 p-4">
+      <Card className="max-w-4xl mx-auto">
+        <CardHeader>
+          <div className="text-center text-2xl">
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">Numerology Reading</h1>
+            <p className="text-gray-600">Discover your life path and destiny numbers</p>
           </div>
-        )}
-      </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-6">
+            {/* Input Section */}
+            <div className="grid gap-6">
+              <div className="space-y-2">
+                <label htmlFor="birthdate">Birth Date</label>
+                <div className="flex items-center space-x-2">
+                  <Calendar className="w-5 h-5 text-gray-500" />
+                  <input
+                    id="birthdate"
+                    type="date"
+                    value={birthDate}
+                    onChange={(e:any) => setBirthDate(e.target.value)} // eslint-disable-line @typescript-eslint/no-explicit-any
+                    className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-200 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="fullname">Full Name</label>
+                <div className="flex items-center space-x-2">
+                  <User className="w-5 h-5 text-gray-500" />
+                  <input
+                    id="fullname"
+                    type="text"
+                    value={fullName}
+                    onChange={(e: any) => setFullName(e.target.value)} // eslint-disable-line @typescript-eslint/no-explicit-any
+                    placeholder="Enter your full name"
+                    className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-200 outline-none"
+                  />
+                </div>
+              </div>
+
+              <button 
+                onClick={handleCalculate}
+                disabled={isCalculating || !birthDate || !fullName}
+                className="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium flex justify-center"
+              >
+                {isCalculating ? (
+                  <div className="flex items-center space-x-2">
+                    <Calculator className="w-5 h-5 animate-spin" />
+                    <span>Calculating...</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-2">
+                    <Calculator className="w-5 h-5" />
+                    <span>Calculate Numbers</span>
+                  </div>
+                )}
+              </button>
+            </div>
+
+            {/* Results Section */}
+            {results.length > 0 && (
+              <div className="space-y-6 mt-8">
+                <h3 className="text-xl font-semibold text-center">Your Numerology Results</h3>
+                
+                <div className="grid gap-6 md:grid-cols-2">
+                  {/* Life Path Number */}
+                  <Card>
+                    <CardContent className="p-6">
+                      <h4 className="font-semibold text-lg mb-2">Life Path Number: {results[0].lifePath.number}</h4>
+                      <p className="text-gray-600">{results[0].lifePath.meaning}</p>
+                    </CardContent>
+                  </Card>
+
+                  {/* Name Number */}
+                  <Card>
+                    <CardContent className="p-6">
+                      <h4 className="font-semibold text-lg mb-2">Name Number: {results[0].name.number}</h4>
+                      <p className="text-gray-600">{results[0].name.meaning}</p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
 
-export default NumerologyApp;
+export default NumerologyCalculator;
