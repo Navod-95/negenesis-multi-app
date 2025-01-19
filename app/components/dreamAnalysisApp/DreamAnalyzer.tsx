@@ -1,20 +1,44 @@
 "use client"
-
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Book, Moon, Search, Plus, Calendar, RotateCw, Sparkles, Cloud, Sun } from 'lucide-react';
-import { Card, CardContent } from '../ui/card-component';
-import { Alert, AlertDescription } from '../ui/alert-component';
 
-const DreamAnalyzer = () => {
-  const [dreams, setDreams] = useState(new Array<any>); // eslint-disable-line @typescript-eslint/no-explicit-any
-  const [currentDream, setCurrentDream] = useState('');
-  //const [analysis, setAnalysis] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState('write');
+// Type definitions
+interface DreamSymbol {
+  symbol: string;
+  meaning: string;
+}
 
-  const commonSymbols = {
+interface DreamAnalysis {
+  mainThemes: string[];
+  symbols: DreamSymbol[];
+  mood: 'positive' | 'negative' | 'neutral';
+  interpretation: string;
+  guidance: string;
+  timestamp: string;
+}
+
+interface Dream {
+  text: string;
+  analysis: DreamAnalysis;
+}
+
+interface CommonSymbols {
+  [key: string]: string;
+}
+
+const DreamAnalyzer: React.FC = () => {
+  // State management with proper types
+  const [dreams, setDreams] = useState<Dream[]>([]);
+  const [currentDream, setCurrentDream] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [activeTab, setActiveTab] = useState<'write' | 'journal'>('write');
+  const [showResponse, setShowResponse] = useState<boolean>(false);
+  const [currentAnalysis, setCurrentAnalysis] = useState<DreamAnalysis | null>(null);
+
+  // Common dream symbols and their meanings
+  const commonSymbols: CommonSymbols = {
     flying: 'Feeling of freedom, escape from limitations',
     falling: 'Loss of control, anxiety about a situation',
     water: 'Emotions, unconscious mind, clarity',
@@ -25,16 +49,17 @@ const DreamAnalyzer = () => {
     vehicles: 'Direction in life, journey towards goals'
   };
 
-  const analyzeDream = async (dreamText: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+  const analyzeDream = useCallback(async (dreamText: string) => {
+    if (!dreamText.trim()) return;
+
     setLoading(true);
     setError('');
+    setShowResponse(false);
 
     try {
-      // Simulate API call for dream analysis
       await new Promise(resolve => setTimeout(resolve, 1500));
 
-      // Example analysis - in a real app, this would come from an AI model
-      const dreamAnalysis: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
+      const analysis: DreamAnalysis = {
         mainThemes: ['personal growth', 'transformation', 'relationships'],
         symbols: detectSymbols(dreamText),
         mood: analyzeMood(dreamText),
@@ -43,86 +68,135 @@ const DreamAnalyzer = () => {
         timestamp: new Date().toISOString()
       };
 
-      //setAnalysis(dreamAnalysis);
-      setDreams((prev: any) => [...prev, { text: dreamText, analysis: dreamAnalysis }]); // eslint-disable-line @typescript-eslint/no-explicit-any
-      setCurrentDream('');
+      const newDream: Dream = {
+        text: dreamText,
+        analysis: analysis
+      };
+
+      setDreams(prev => [newDream, ...prev]);
+      setCurrentAnalysis(analysis);
+      setShowResponse(true);
     } catch (err) {
       setError('Failed to analyze dream. Please try again.');
       console.error('Error analyzing dream:', err);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const detectSymbols = (text: string) => {
-    // Simple symbol detection - in reality, would use NLP
+  const detectSymbols = (text: string): DreamSymbol[] => {
     return Object.entries(commonSymbols)
       .filter(([symbol]) => text.toLowerCase().includes(symbol.toLowerCase()))
       .map(([symbol, meaning]) => ({ symbol, meaning }));
   };
 
-  const analyzeMood = (text: string) => {
-    // Simple mood analysis - would use sentiment analysis in real app
+  const analyzeMood = (text: string): DreamAnalysis['mood'] => {
     const moodIndicators = {
       positive: ['happy', 'peaceful', 'exciting', 'beautiful'],
       negative: ['scary', 'anxious', 'frightening', 'dark'],
       neutral: ['strange', 'unclear', 'mysterious']
     };
 
-    let mood = 'neutral';
     const textLower = text.toLowerCase();
-
-    if (moodIndicators.positive.some(word => textLower.includes(word))) {
-      mood = 'positive';
-    } else if (moodIndicators.negative.some(word => textLower.includes(word))) {
-      mood = 'negative';
-    }
-
-    return mood;
+    if (moodIndicators.positive.some(word => textLower.includes(word))) return 'positive';
+    if (moodIndicators.negative.some(word => textLower.includes(word))) return 'negative';
+    return 'neutral';
   };
 
-  const generateInterpretation = (text: string) => {
-    // Simplified interpretation - would use AI model in real app
+  const generateInterpretation = (text: string): string => {
     const symbols = detectSymbols(text);
     const mood = analyzeMood(text);
-
     return `Your dream appears to reflect ${mood} emotions and contains symbols related to ${
       symbols.map(s => s.symbol).join(', ') || 'general themes'
     }. This suggests you might be processing experiences related to these themes.`;
   };
 
-  const provideGuidance = (text: string) => {
-    // Simple guidance generation - would use AI in real app
+  const provideGuidance = (text: string): string => {
     const mood = analyzeMood(text);
-    
-    const guidance: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
+    const guidance = {
       positive: 'Consider how you can maintain and build upon the positive elements in your waking life.',
       negative: 'These symbols might be highlighting areas that need attention or resolution in your life.',
       neutral: 'Reflect on these symbols and how they might relate to your current life situation.'
     };
-
     return guidance[mood];
   };
 
-  // Filter dreams based on search term
-  const filteredDreams = dreams.filter((dream: any) => // eslint-disable-line @typescript-eslint/no-explicit-any
-    dream.text.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    dream.analysis.mainThemes.some((theme: any) =>  // eslint-disable-line @typescript-eslint/no-explicit-any
-      theme.toLowerCase().includes(searchTerm.toLowerCase())
-    ) ||
-    dream.analysis.symbols.some((symbol: any) => // eslint-disable-line @typescript-eslint/no-explicit-any
-      symbol.symbol.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    analyzeDream(currentDream);
+  };
+
+  const handleNewDream = () => {
+    setCurrentDream('');
+    setShowResponse(false);
+    setCurrentAnalysis(null);
+    setActiveTab('write');
+  };
+
+  const filteredDreams = dreams.filter(dream => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      dream.text.toLowerCase().includes(searchLower) ||
+      dream.analysis.mainThemes.some(theme => theme.toLowerCase().includes(searchLower)) ||
+      dream.analysis.symbols.some(symbol => symbol.symbol.toLowerCase().includes(searchLower))
+    );
+  });
+
+  const renderAnalysis = (analysis: DreamAnalysis) => (
+    <div className="space-y-6 mt-6 bg-gray-50 p-6 rounded-xl">
+      {/* Themes */}
+      <div className="bg-white p-4 rounded-lg shadow-sm">
+        <h4 className="font-medium text-gray-800 mb-2 flex items-center gap-2">
+          <Sun className="w-4 h-4 text-indigo-600" />
+          Main Themes
+        </h4>
+        <div className="flex flex-wrap gap-2">
+          {analysis.mainThemes.map((theme, i) => (
+            <span
+              key={i}
+              className="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium"
+            >
+              {theme}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Symbols */}
+      <div className="bg-white p-4 rounded-lg shadow-sm">
+        <h4 className="font-medium text-gray-800 mb-2">Symbols Found</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {analysis.symbols.map((symbol, i) => (
+            <div key={i} className="bg-gray-50 p-3 rounded-lg">
+              <span className="font-medium text-indigo-600">{symbol.symbol}</span>
+              <p className="text-sm text-gray-600 mt-1">{symbol.meaning}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Interpretation & Guidance */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-white p-4 rounded-lg shadow-sm">
+          <h4 className="font-medium text-gray-800 mb-2">Interpretation</h4>
+          <p className="text-sm text-gray-600">{analysis.interpretation}</p>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-sm">
+          <h4 className="font-medium text-gray-800 mb-2">Guidance</h4>
+          <p className="text-sm text-gray-600">{analysis.guidance}</p>
+        </div>
+      </div>
+    </div>
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white">
-      <div className="w-full max-w-5xl mx-auto p-6">
+    <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white p-6">
+      <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-2">
             <Moon className="w-8 h-8 text-indigo-600" />
-            <h1 className="text-3xl font-bold text-gray-800">Dreamscape Analyzer</h1>
+            <h1 className="text-3xl font-bold text-gray-800">Dream Analyzer</h1>
           </div>
           <p className="text-gray-600">Uncover the hidden meanings in your dreams</p>
         </div>
@@ -153,15 +227,15 @@ const DreamAnalyzer = () => {
             >
               <div className="flex items-center gap-2">
                 <Book className="w-4 h-4" />
-                Journal
+                Journal ({dreams.length})
               </div>
             </button>
           </div>
         </div>
 
-        {activeTab === 'write' ? (
-          <Card className="bg-white shadow-xl border-0 overflow-hidden">
-            <CardContent className="p-6">
+        {activeTab === 'write' && (
+          <div className="bg-white shadow-xl rounded-lg overflow-hidden">
+            <form onSubmit={handleSubmit} className="p-6">
               <div className="space-y-4">
                 <div className="relative">
                   <textarea
@@ -176,8 +250,8 @@ const DreamAnalyzer = () => {
                 </div>
 
                 <button
+                  type="submit"
                   className="w-full py-3 bg-indigo-600 text-white rounded-xl flex items-center justify-center gap-2 hover:bg-indigo-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
-                  onClick={() => analyzeDream(currentDream)}
                   disabled={!currentDream.trim() || loading}
                 >
                   {loading ? (
@@ -194,14 +268,18 @@ const DreamAnalyzer = () => {
                 </button>
 
                 {error && (
-                  <Alert variant="destructive" className="animate-slideIn">
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
+                  <div className="bg-red-50 text-red-600 p-4 rounded-lg animate-fadeIn">
+                    {error}
+                  </div>
                 )}
               </div>
-            </CardContent>
-          </Card>
-        ) : (
+            </form>
+
+            {showResponse && currentAnalysis && renderAnalysis(currentAnalysis)}
+          </div>
+        )}
+
+        {activeTab === 'journal' && (
           <div className="space-y-6">
             {/* Search Bar */}
             <div className="relative">
@@ -215,15 +293,17 @@ const DreamAnalyzer = () => {
               />
             </div>
 
-            {/* Dream Journal Entries */}
+            {/* Dream Entries */}
             <div className="space-y-6">
-              {filteredDreams.map((dream: any, index: number) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
-                <Card key={index} className="bg-white shadow-lg border-0 hover:shadow-xl transition-shadow duration-200">
-                  <CardContent className="p-6">
+              {filteredDreams.map((dream, index) => (
+                <div key={index} className="bg-white shadow-lg rounded-lg overflow-hidden">
+                  <div className="p-6">
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex items-center gap-2">
                         <Cloud className="w-5 h-5 text-indigo-600" />
-                        <h3 className="font-semibold text-lg text-gray-800">Dream #{dreams.length - index}</h3>
+                        <h3 className="font-semibold text-lg text-gray-800">
+                          Dream #{dreams.length - index}
+                        </h3>
                       </div>
                       <span className="text-sm text-gray-500 flex items-center gap-1">
                         <Calendar className="w-4 h-4" />
@@ -232,53 +312,9 @@ const DreamAnalyzer = () => {
                     </div>
 
                     <p className="text-gray-700 mb-6 leading-relaxed">{dream.text}</p>
-
-                    <div className="space-y-6">
-                      {/* Themes */}
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <h4 className="font-medium text-gray-800 mb-2 flex items-center gap-2">
-                          <Sun className="w-4 h-4 text-indigo-600" />
-                          Main Themes
-                        </h4>
-                        <div className="flex flex-wrap gap-2">
-                          {dream.analysis.mainThemes.map((theme: any, i: number) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
-                            <span
-                              key={i}
-                              className="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium"
-                            >
-                              {theme}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Symbols */}
-                      <div>
-                        <h4 className="font-medium text-gray-800 mb-2">Symbols Found</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          {dream.analysis.symbols.map((symbol: any, i: number) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
-                            <div key={i} className="bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
-                              <span className="font-medium text-indigo-600">{symbol.symbol}</span>
-                              <p className="text-sm text-gray-600 mt-1">{symbol.meaning}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Interpretation & Guidance */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                          <h4 className="font-medium text-gray-800 mb-2">Interpretation</h4>
-                          <p className="text-sm text-gray-600">{dream.analysis.interpretation}</p>
-                        </div>
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                          <h4 className="font-medium text-gray-800 mb-2">Guidance</h4>
-                          <p className="text-sm text-gray-600">{dream.analysis.guidance}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    {renderAnalysis(dream.analysis)}
+                  </div>
+                </div>
               ))}
 
               {filteredDreams.length === 0 && (
@@ -291,24 +327,6 @@ const DreamAnalyzer = () => {
           </div>
         )}
       </div>
-
-      {/* Add custom styles */}
-      <style jsx global>{`
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .animate-slideIn {
-          animation: slideIn 0.3s ease-out;
-        }
-      `}</style>
     </div>
   );
 };
